@@ -84,19 +84,31 @@ def delete_column(row):
     for i in range(no_column_remove+1):
         checkbox_state[row][end-i] = False
 
+    if(checkbox_state[0][0] == False and checkbox_state[1][0] == False and checkbox_state[2][0] == False):
+        font = pg.font.Font(None, 36)  # Use default system font, size 36
+        text = font.render('Computer wins', True, (0, 0, 0))  # Render text
+        text_rect = text.get_rect(center=(100, 100))
+        screen.blit(text, text_rect)
+        # Update the display
+        pg.display.update()
+        time.sleep(2)
+
+        print("Computer wins")
+
+
 # This is the easy mode
 def computer_move():
     print("computer played")
     if(checkbox_state[0][0] == False and checkbox_state[1][0] == False and checkbox_state[2][0] == False):
         font = pg.font.Font(None, 36)  # Use default system font, size 36
-        text = font.render('Player 1 Won!', True, (0, 0, 0))  # Render text
+        text = font.render('Player 1 wins!', True, (0, 0, 0))  # Render text
         text_rect = text.get_rect(center=(100, 100))
         screen.blit(text, text_rect)
         # Update the display
         pg.display.update()
-        time.sleep(1)
+        time.sleep(2)
     
-        print("Player Has won")
+        print("Player wins")
         
     # Computer chooses a column to click on
     if(checkbox_state[0][0] == True):
