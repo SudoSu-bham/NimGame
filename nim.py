@@ -1,6 +1,7 @@
 import pygame as pg
 import sys
 import random
+import time
 
 
 pg.init()
@@ -72,23 +73,37 @@ def randomly_fill_checkboxes():
 
 randomly_fill_checkboxes()
 
+def delete_column(row):
+    end = NUM_COLS-1
+    if(not checkbox_state[row][NUM_COLS-1]):
+        end =  (checkbox_state[row]).index(False)
+
+    no_column_remove = random.randint(1,end)
+    print(end, "Column to remove: ",no_column_remove)
+    for i in range(no_column_remove+1):
+        checkbox_state[row][end-i] = False
+
 def computer_move():
     print("computer played")
-    #Computer chooses a column to click on
-    start = 0
-    end = 2
-    if(not checkbox_state[0][0]):
-        start = 1
-        if(not checkbox_state[1][0]):
-            start = 2
-            if(not checkbox_state[2][0]):
-                print("you won")
-    if(not checkbox_state[2][0]):
-        end = 1
-        if(not checkbox_state[1][0]):
-            end = 0
+    if(checkbox_state[0][0] == False and checkbox_state[1][0] == False and checkbox_state[2][0] == False):
+        font = pg.font.Font(None, 36)  # Use default system font, size 36
+        text = font.render('Hello, Pygame!', True, (0, 0, 0))  # Render text with black color
+        text_rect = text.get_rect(center=(100, 100))
+        screen.blit(text, text_rect)
+        # Update the display
+        pg.display.update()
+        time.sleep(2)
     
-    row_to_remove = random.randint(start,end)
+        print("Player Has won")
+        
+    #Computer chooses a column to click on
+    if(checkbox_state[0][0] == True):
+        delete_column(0)
+    elif(checkbox_state[1][0] == True):
+        delete_column(1)
+    elif(checkbox_state[2][0] == True):
+        delete_column(2)
+
 
 def draw_button():
     button_rect = pg.Rect((WIDTH - BUTTON_WIDTH) // 2, HEIGHT - 100, BUTTON_WIDTH, BUTTON_HEIGHT)
@@ -127,11 +142,12 @@ while running:
                         draw_checkboxes() #Updating player move
                         computer_move()
                         break
-    
+
     screen.fill(WHITE)
     draw_checkboxes()
     draw_button()
-    pg.display.flip()
+    pg.display.update()
+    # pg.display.flip()
 
 pg.quit()
 sys.exit()
