@@ -71,8 +71,9 @@ def randomly_fill_checkboxes():
             checkbox_state[i][j] = True
 
 
-randomly_fill_checkboxes()
+randomly_fill_checkboxes() # Filling randomly for the first time
 
+# Deleting a range of columns selected by computer
 def delete_column(row):
     end = NUM_COLS-1
     if(not checkbox_state[row][NUM_COLS-1]):
@@ -83,28 +84,30 @@ def delete_column(row):
     for i in range(no_column_remove+1):
         checkbox_state[row][end-i] = False
 
+# This is the easy mode
 def computer_move():
     print("computer played")
     if(checkbox_state[0][0] == False and checkbox_state[1][0] == False and checkbox_state[2][0] == False):
         font = pg.font.Font(None, 36)  # Use default system font, size 36
-        text = font.render('Hello, Pygame!', True, (0, 0, 0))  # Render text with black color
+        text = font.render('Player 1 Won!', True, (0, 0, 0))  # Render text
         text_rect = text.get_rect(center=(100, 100))
         screen.blit(text, text_rect)
         # Update the display
         pg.display.update()
-        time.sleep(2)
+        time.sleep(1)
     
         print("Player Has won")
         
-    #Computer chooses a column to click on
+    # Computer chooses a column to click on
     if(checkbox_state[0][0] == True):
         delete_column(0)
     elif(checkbox_state[1][0] == True):
         delete_column(1)
     elif(checkbox_state[2][0] == True):
         delete_column(2)
+    
 
-
+# Making a Reset game button
 def draw_button():
     button_rect = pg.Rect((WIDTH - BUTTON_WIDTH) // 2, HEIGHT - 100, BUTTON_WIDTH, BUTTON_HEIGHT)
     pg.draw.rect(screen, BUTTON_COLOR, button_rect)
@@ -114,7 +117,7 @@ def draw_button():
 
 
 screen = pg.display.set_mode((WIDTH, HEIGHT))
-pg.display.set_caption("Checkbox Example")
+pg.display.set_caption("Nim Game")
 
 
 running = True
@@ -146,11 +149,8 @@ while running:
     screen.fill(WHITE)
     draw_checkboxes()
     draw_button()
-    pg.display.update()
-    # pg.display.flip()
+    # pg.display.update()
+    pg.display.flip()
 
 pg.quit()
 sys.exit()
-
-# while True:
-#     game_loop()
