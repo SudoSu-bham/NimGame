@@ -4,17 +4,13 @@ gi.require_version('Gtk','3.0')
 from gi.repository import Gtk
 
 import random
-import time
-
 import const as c
 
-
-
-checkbox_state = [[False] * c.NUM_COLS for _ in range(c.NUM_ROWS)]
 
 class NimGame:
     
     def __init__(self):
+        self.checkbox_state = [[False] * c.NUM_COLS for _ in range(c.NUM_ROWS)]
         self.winner_player = None
         self.clock = pygame.time.Clock() # set up clock for managing the frame rate.
         self.randomly_fill_checkboxes()
@@ -41,58 +37,54 @@ class NimGame:
         for i in range(c.NUM_ROWS):
             for j in range(c.NUM_COLS):
                 rect = pygame.Rect((c.WIDTH - c.CHECKBOX_WIDTH) // 2 + j * (c.CHECKBOX_SIZE + c.CHECKBOX_MARGIN), (c.HEIGHT - c.CHECKBOX_HEIGHT) // 2 + i * (c.CHECKBOX_SIZE + c.CHECKBOX_MARGIN), c.CHECKBOX_SIZE, c.CHECKBOX_SIZE)
-                pygame.draw.rect(c.WIN, c.BLACK, rect, 1)
+                pygame.draw.rect(c.WIN, c.BLACK, rect, 2)
                 # Fill checkbox with color if it's checked
-                if checkbox_state[i][j]:
+                if self.checkbox_state[i][j]:
                     pygame.draw.rect(c.WIN, "green", rect)
-        # pygame.display.update()
 
     def toggle_checkbox(self, row, col):
-        checkbox_state[row][col] = not checkbox_state[row][col]
+        self.checkbox_state[row][col] = not self.checkbox_state[row][col]
 
 
     def randomly_fill_checkboxes(self):
         # Reset all checkbox states to False
         for i in range(c.NUM_ROWS):
             for j in range(c.NUM_COLS):
-                checkbox_state[i][j] = False
+                self.checkbox_state[i][j] = False
 
         # Randomly fill checkboxes
         for i in range(c.NUM_ROWS):
             num_to_fill = random.randint(1, c.NUM_COLS)  # Number of checkboxes to fill in current row
             start_col = 0
             for j in range(start_col, start_col + num_to_fill):
-                checkbox_state[i][j] = True
-
-
-    # self.randomly_fill_checkboxes() # Filling randomly for the first time
+                self.checkbox_state[i][j] = True
 
     # Deleting a range of columns selected by computer
     def delete_column(self, row):
         end = c.NUM_COLS-1
-        if(not checkbox_state[row][c.NUM_COLS-1]):
-            end =  (checkbox_state[row]).index(False)
+        if(not self.checkbox_state[row][c.NUM_COLS-1]):
+            end =  (self.checkbox_state[row]).index(False)
 
         no_column_remove = random.randint(1,end)
         print(end, "Column to remove: ",no_column_remove)
         for i in range(no_column_remove+1):
-            checkbox_state[row][end-i] = False
+            self.checkbox_state[row][end-i] = False
 
-        if(checkbox_state[0][0] == False and checkbox_state[1][0] == False and checkbox_state[2][0] == False):
+        if(self.checkbox_state[0][0] == False and self.checkbox_state[1][0] == False and self.checkbox_state[2][0] == False):
             self.winner(0)
 
     # This is the easy mode
     def computer_move(self):
         print("computer played")
-        if(checkbox_state[0][0] == False and checkbox_state[1][0] == False and checkbox_state[2][0] == False):
+        if(self.checkbox_state[0][0] == False and self.checkbox_state[1][0] == False and self.checkbox_state[2][0] == False):
             self.winner(1)
             
         # Computer chooses a column to click on
-        if(checkbox_state[0][0] == True):
+        if(self.checkbox_state[0][0] == True):
             self.delete_column(0)
-        elif(checkbox_state[1][0] == True):
+        elif(self.checkbox_state[1][0] == True):
             self.delete_column(1)
-        elif(checkbox_state[2][0] == True):
+        elif(self.checkbox_state[2][0] == True):
             self.delete_column(2)
         
 
@@ -109,16 +101,12 @@ class NimGame:
     def run(self):
         self.running = True
         c.init()
-        # screen = pygame.display.get_surface()
-        # width = c.WIN.get_width()
-        # height = c.WIN.get_height()
         while self.running:
             # Pump GTK messages.
             while Gtk.events_pending():
                 Gtk.main_iteration()
             if not self.running:
                 break
-
 
             # Pump PyGame messages.
             for event in pygame.event.get():
@@ -140,14 +128,14 @@ class NimGame:
                         for j in range(c.NUM_COLS):
                             rect = pygame.Rect((c.WIDTH - c.CHECKBOX_WIDTH) // 2 + j * (c.CHECKBOX_SIZE + c.CHECKBOX_MARGIN), (c.HEIGHT - c.CHECKBOX_HEIGHT) // 2 + i * (c.CHECKBOX_SIZE + c.CHECKBOX_MARGIN), c.CHECKBOX_SIZE, c.CHECKBOX_SIZE)
                             if rect.collidepoint(x, y):
-                                if not checkbox_state[i][j]:
+                                if not self.checkbox_state[i][j]:
                                     print("Wrong move")
                                     break
-                                checkbox_state[i][j] = not checkbox_state[i][j]
-                                if not checkbox_state[i][j]:
+                                self.checkbox_state[i][j] = not self.checkbox_state[i][j]
+                                if not self.checkbox_state[i][j]:
                                     for k in range(j, c.NUM_COLS):
-                                        checkbox_state[i][k] = False
-                                    print(i,j,checkbox_state[i][j])
+                                        self.checkbox_state[i][k] = False
+                                    print(i,j,self.checkbox_state[i][j])
                                 self.draw_checkboxes() #Updating player move
                                 self.computer_move()
                                 # pygame.display.update()
