@@ -11,13 +11,14 @@ class NimGame:
     
     def __init__(self):
         self.checkbox_state = [[False] * c.NUM_COLS for _ in range(c.NUM_ROWS)]
-        self.winner_player = None # 
+        self.winner_player = None
         self.need_help = False
 
-        self.clock = pygame.time.Clock() # set up clock for managing the frame rate.
-        self.randomly_fill_checkboxes()
+        self.clock = pygame.time.Clock() # Set up clock for managing the frame rate.
+        self.randomly_fill_checkboxes() # First time fill all box randomly
 
-    def winner(self, who):
+    # Declare the winner
+    def winner(self, who): 
         self.winner_player = who
         font = pygame.font.Font(None, 36)
         win_text = "You won!"
@@ -70,15 +71,15 @@ class NimGame:
         if(self.checkbox_state[0][0] == False and self.checkbox_state[1][0] == False and self.checkbox_state[2][0] == False):
             self.winner(1)
             
-        # Computer chooses a column to click on
-        if(self.checkbox_state[0][0] == True):
+        # Computer chooses a row to click on
+        elif(self.checkbox_state[0][0] == True):
             self.delete_column(0)
         elif(self.checkbox_state[1][0] == True):
             self.delete_column(1)
         elif(self.checkbox_state[2][0] == True):
             self.delete_column(2)
 
-    # Making a Reset game button
+    # Making a Reset game button and help menu
     def draw(self):
         if self.need_help == True:
             c.HELP_SYMBOL = "X"
