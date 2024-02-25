@@ -11,29 +11,30 @@ class NimGame:
     
     def __init__(self):
         self.checkbox_state = [[False] * c.NUM_COLS for _ in range(c.NUM_ROWS)]
-        self.winner_player = None
+        self.winner_player = None # To reduce
+        self.game_status = None
+        self.need_help = False
+
         self.clock = pygame.time.Clock() # set up clock for managing the frame rate.
         self.randomly_fill_checkboxes()
 
     def winner(self, name):
         self.winner_player = name
         font = pygame.font.Font(None, 36)
-        
-        if(name == None): pass
-        
+        win_text = "You won!"
+        if(name == None): return
         elif(name == 0):
-            win_surf = font.render("Computer won!",True,(0, 0, 0))
-            rec_surf = win_surf.get_rect(center = (c.WIDTH//10,c.HEIGHT//10))
-            c.WIN.blit(win_surf,rec_surf)
-        
-        else:
-            win_surf = font.render("You won!",True,(0, 0, 0))
-            rec_surf = win_surf.get_rect(center = (100,100))
-            c.WIN.blit(win_surf,rec_surf)    
+            win_text = "Computer won! Better Luck next time :("
 
+        win_surf = font.render(win_text,True,"white")
+        rec_surf = win_surf.get_rect(center = (c.WIDTH-c.WIDTH//2, c.HEIGHT-c.HEIGHT//2+100))
+        c.WIN.blit(win_surf,rec_surf)    
+
+        # self.game_status = "done"
 
     def draw_checkboxes(self):
-        c.WIN.fill(pygame.Color("white"))
+        # c.WIN.fill(pygame.Color(129, 133, 137))
+
         for i in range(c.NUM_ROWS):
             for j in range(c.NUM_COLS):
                 rect = pygame.Rect((c.WIDTH - c.CHECKBOX_WIDTH) // 2 + j * (c.CHECKBOX_SIZE + c.CHECKBOX_MARGIN), (c.HEIGHT - c.CHECKBOX_HEIGHT) // 2 + i * (c.CHECKBOX_SIZE + c.CHECKBOX_MARGIN), c.CHECKBOX_SIZE, c.CHECKBOX_SIZE)
@@ -66,7 +67,6 @@ class NimGame:
             end =  (self.checkbox_state[row]).index(False)
 
         no_column_remove = random.randint(1,end)
-        print(end, "Column to remove: ",no_column_remove)
         for i in range(no_column_remove+1):
             self.checkbox_state[row][end-i] = False
 
@@ -75,7 +75,6 @@ class NimGame:
 
     # This is the easy mode
     def computer_move(self):
-        print("computer played")
         if(self.checkbox_state[0][0] == False and self.checkbox_state[1][0] == False and self.checkbox_state[2][0] == False):
             self.winner(1)
             
@@ -86,16 +85,47 @@ class NimGame:
             self.delete_column(1)
         elif(self.checkbox_state[2][0] == True):
             self.delete_column(2)
-        
 
     # Making a Reset game button
-    def draw_button(self):
+    def draw(self):
+        if self.need_help == True:
+            c.HELP_SYMBOL = "X"
+            y = c.MARGIN
+            font = pygame.font.Font(None, 26)
+            for line in c.GAME_RULE:
+                text_surface = font.render(line, True, "white")
+                text_rect = text_surface.get_rect(topleft=(c.MARGIN, y))
+                c.WIN.blit(text_surface, text_rect)
+                y += c.LINE_SPACING
+
         BUTTON_FONT = pygame.font.SysFont(None, c.BUTTON_FONT_SIZE)
-        button_rect = pygame.Rect((c.WIDTH - c.BUTTON_WIDTH) // 2, c.HEIGHT - 100, c.BUTTON_WIDTH, c.BUTTON_HEIGHT)
-        pygame.draw.rect(c.WIN, c.BUTTON_COLOR, button_rect)
+        self.button_rect = pygame.Rect((c.WIDTH - c.BUTTON_WIDTH) // 2, c.HEIGHT - 150, c.BUTTON_WIDTH, c.BUTTON_HEIGHT)
+        pygame.draw.rect(c.WIN, c.BUTTON_COLOR, self.button_rect,0,border_radius=20)
         button_text = BUTTON_FONT.render(c.BUTTON_TEXT, True, c.BUTTON_TEXT_COLOR)
-        text_rect = button_text.get_rect(center=button_rect.center)
+        text_rect = button_text.get_rect(center=self.button_rect.center)
         c.WIN.blit(button_text, text_rect)
+
+        HELP_FONT = pygame.font.SysFont(None, 80)
+        self.help_cicle = pygame.draw.circle(c.WIN,"white",[c.WIDTH - 100, c.HEIGHT-(c.HEIGHT)+100], 40,40)
+        help_text = HELP_FONT.render(c.HELP_SYMBOL, True, (129, 133, 137))
+        help_rect = help_text.get_rect(center=self.help_cicle.center)
+        c.WIN.blit(help_text,help_rect)
+
+
+    # Handling events of mouse clicks on boxes
+    def player_move(self, x, y):
+        for i in range(c.NUM_ROWS):
+            for j in range(c.NUM_COLS):
+                rect = pygame.Rect((c.WIDTH - c.CHECKBOX_WIDTH) // 2 + j * (c.CHECKBOX_SIZE + c.CHECKBOX_MARGIN), (c.HEIGHT - c.CHECKBOX_HEIGHT) // 2 + i * (c.CHECKBOX_SIZE + c.CHECKBOX_MARGIN), c.CHECKBOX_SIZE, c.CHECKBOX_SIZE)
+                if rect.collidepoint(x, y):
+                    if not self.checkbox_state[i][j]:
+                        break
+                    self.checkbox_state[i][j] = not self.checkbox_state[i][j]
+                    if not self.checkbox_state[i][j]:
+                        for k in range(j, c.NUM_COLS):
+                            self.checkbox_state[i][k] = False
+                    self.computer_move()
+                    break
 
     # The main game loop.
     def run(self):
@@ -112,47 +142,45 @@ class NimGame:
             for event in pygame.event.get():
                 if event.type == pygame.QUIT:
                     self.running = False
+                elif event.type == pygame.VIDEORESIZE:
+                    pygame.display.set_mode((c.WIDTH, c.HEIGHT), pygame.RESIZABLE)
+                    self.game_status = None # This will update screen when changing window size after winning
+                    break
                 elif event.type == pygame.MOUSEBUTTONDOWN and event.button == 1:
                     x, y = pygame.mouse.get_pos()
-                    button_rect = pygame.Rect((c.WIDTH - c.BUTTON_WIDTH) // 2, c.HEIGHT - 100, c.BUTTON_WIDTH, c.BUTTON_HEIGHT)
-                    if button_rect.collidepoint(x, y):
-                        c.BUTTON_TEXT="Reset Game"
+                    # button_rect = pygame.Rect((c.WIDTH - c.BUTTON_WIDTH) // 2, c.HEIGHT - 100, c.BUTTON_WIDTH, c.BUTTON_HEIGHT)
+                    # help_cicle = pygame.draw.circle(c.WIN,"green",[c.WIDTH - 100, c.HEIGHT-(c.HEIGHT)+100], 30,30)
+
+                    if self.button_rect.collidepoint(x, y):
                         self.randomly_fill_checkboxes()
                         self.winner_player = None
+                        self.game_status = None
                         break
-                    # elif self.winner_player != None:
-                    #     self.winner(self.winner_player)
-                    #     print("calling winner")
-                    #     break
-                    for i in range(c.NUM_ROWS):
-                        for j in range(c.NUM_COLS):
-                            rect = pygame.Rect((c.WIDTH - c.CHECKBOX_WIDTH) // 2 + j * (c.CHECKBOX_SIZE + c.CHECKBOX_MARGIN), (c.HEIGHT - c.CHECKBOX_HEIGHT) // 2 + i * (c.CHECKBOX_SIZE + c.CHECKBOX_MARGIN), c.CHECKBOX_SIZE, c.CHECKBOX_SIZE)
-                            if rect.collidepoint(x, y):
-                                if not self.checkbox_state[i][j]:
-                                    print("Wrong move")
-                                    break
-                                self.checkbox_state[i][j] = not self.checkbox_state[i][j]
-                                if not self.checkbox_state[i][j]:
-                                    for k in range(j, c.NUM_COLS):
-                                        self.checkbox_state[i][k] = False
-                                    print(i,j,self.checkbox_state[i][j])
-                                self.draw_checkboxes() #Updating player move
-                                self.computer_move()
-                                # pygame.display.update()
-                                # time.sleep(1)
-                                break
+                    elif self.help_cicle.collidepoint(x,y):
+                        self.need_help = not self.need_help
+                        c.HELP_SYMBOL = "?"
+                        self.game_status = None
+                        self.draw()
 
-            # c.WIN.fill(c.WHITE)
-            self.draw_checkboxes()
-            self.draw_button()
-            self.winner(self.winner_player)
-            pygame.display.update()
-            # pygame.display.flip()
+                    if self.game_status == "done": # If the game is completed. No need to go further
+                        break
+
+                    self.player_move(x, y)
+
+            if(self.game_status == None):
+                c.WIN.fill(pygame.Color(129, 133, 137))
+                self.draw_checkboxes()
+                self.draw()
+                self.winner(self.winner_player)
+                pygame.display.update()
+
+                if(self.winner_player != None):
+                    self.game_status = "done"
             self.clock.tick(30)
 
 def main():
     pygame.init()
-    pygame.display.set_mode((0, 0), pygame.RESIZABLE)
+    pygame.display.set_mode((c.WIDTH, c.HEIGHT), pygame.RESIZABLE)
     game = NimGame()
     game.run()
     
