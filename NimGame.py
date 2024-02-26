@@ -9,7 +9,8 @@ from gi.repository import Gtk
 
 class NimGame:
     
-    def __init__(self):
+    def __init__(self, journal=True):
+        self.journal = journal
         self.checkbox_state = [[False] * c.NUM_COLS for _ in range(c.NUM_ROWS)]
         self.winner_player = None
         self.need_help = False
@@ -146,7 +147,7 @@ class NimGame:
         c.init()
         pygame.font.init()
         while self.running:
-            if self.jounal:
+            if self.journal:
                 # Pump GTK messages.
                 while Gtk.events_pending():
                     Gtk.main_iteration()
@@ -179,12 +180,14 @@ class NimGame:
             self.winner(self.winner_player)
             pygame.display.update()
             self.clock.tick(30)
-
+        pygame.display.quit()
+        pygame.quit()
+        sys.exit(0)
 
 def main():
     pygame.init()
     pygame.display.set_mode((c.WIDTH, c.HEIGHT))
-    game = NimGame()
+    game = NimGame(journal=False)
     game.run()
     
 if __name__ == '__main__':
