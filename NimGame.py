@@ -1,11 +1,11 @@
 import pygame
 import gi
-gi.require_version('Gtk','3.0')
-from gi.repository import Gtk
-
+import sys
 import random
 import const as c
 
+gi.require_version('Gtk','3.0')
+from gi.repository import Gtk
 
 class NimGame:
     
@@ -16,6 +16,21 @@ class NimGame:
 
         self.clock = pygame.time.Clock() # Set up clock for managing the frame rate.
         self.randomly_fill_checkboxes() # First time fill all box randomly
+
+    def set_canvas(self, canvas):
+        self.canvas = canvas
+        pygame.display.set_caption("Nim Game")
+
+    # Called to save the state of the game to the Journal.
+    def write_file(self, file_path):
+        pass
+
+    # Called to load the state of the game from the Journal.
+    def read_file(self, file_path):
+        pass
+
+    def quit(self):
+        self.running = False
 
     # Declare the winner
     def winner(self, who): 
@@ -122,12 +137,19 @@ class NimGame:
 
     # The main game loop.
     def run(self):
+        for event in pygame.event.get():
+            if event.type == pygame.VIDEORESIZE:
+                pygame.display.set_mode(event.size, pygame.RESIZABLE)
+                c.WIDTH, c.HEIGHT = event.size
+                break
         self.running = True
         c.init()
+        pygame.font.init()
         while self.running:
-            # Pump GTK messages.
-            while Gtk.events_pending():
-                Gtk.main_iteration()
+            if self.jounal:
+                # Pump GTK messages.
+                while Gtk.events_pending():
+                    Gtk.main_iteration()
             if not self.running:
                 break
 
@@ -158,9 +180,10 @@ class NimGame:
             pygame.display.update()
             self.clock.tick(30)
 
+
 def main():
     pygame.init()
-    pygame.display.set_mode((c.WIDTH, c.HEIGHT), pygame.SCALED)
+    pygame.display.set_mode((c.WIDTH, c.HEIGHT))
     game = NimGame()
     game.run()
     
