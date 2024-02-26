@@ -42,9 +42,9 @@ class NimGame:
         elif(who == 0):
             win_text = "Computer won! Better Luck next time :("
 
-        win_surf = font.render(win_text,True,"white")
+        win_surf = font.render(win_text, True, c.WHITE)
         rec_surf = win_surf.get_rect(center = (c.WIDTH-c.WIDTH//2, c.HEIGHT-c.HEIGHT//2+100))
-        c.WIN.blit(win_surf,rec_surf)    
+        c.WIN.blit(win_surf, rec_surf)    
 
 
     def draw_checkboxes(self):
@@ -100,22 +100,23 @@ class NimGame:
         if self.need_help == True:
             c.HELP_SYMBOL = "X"
             y = c.MARGIN
-            font = pygame.font.Font(None, 26)
+            c.LINE_SPACING = c.HEIGHT//27
+            font = pygame.font.Font(None, c.WIDTH//39)
             for line in c.GAME_RULE:
-                text_surface = font.render(line, True, "white")
+                text_surface = font.render(line, True, c.WHITE)
                 text_rect = text_surface.get_rect(topleft=(c.MARGIN, y))
                 c.WIN.blit(text_surface, text_rect)
                 y += c.LINE_SPACING
 
         BUTTON_FONT = pygame.font.SysFont(None, c.BUTTON_FONT_SIZE)
-        self.button_rect = pygame.Rect((c.WIDTH - c.BUTTON_WIDTH) // 2, c.HEIGHT - 150, c.BUTTON_WIDTH, c.BUTTON_HEIGHT)
-        pygame.draw.rect(c.WIN, "white", self.button_rect,0,border_radius=20)
+        self.button_rect = pygame.Rect((c.WIDTH - c.BUTTON_WIDTH) // 2, c.HEIGHT - c.BUTTON_HEIGHT*3, c.BUTTON_WIDTH, c.BUTTON_HEIGHT)
+        pygame.draw.rect(c.WIN, c.WHITE, self.button_rect,0,border_radius=20)
         button_text = BUTTON_FONT.render(c.BUTTON_TEXT, True, c.GUNMETAL)
         text_rect = button_text.get_rect(center=self.button_rect.center)
         c.WIN.blit(button_text, text_rect)
 
         HELP_FONT = pygame.font.SysFont(None, 80)
-        self.help_cicle = pygame.draw.circle(c.WIN,"white",[c.WIDTH - 100, c.HEIGHT-(c.HEIGHT)+100], 40,40)
+        self.help_cicle = pygame.draw.circle(c.WIN,c.WHITE,[c.WIDTH - 100, c.HEIGHT-(c.HEIGHT)+100], 40,40)
         help_text = HELP_FONT.render(c.HELP_SYMBOL, True, c.GUNMETAL)
         help_rect = help_text.get_rect(center=self.help_cicle.center)
         c.WIN.blit(help_text,help_rect)
@@ -178,7 +179,7 @@ class NimGame:
             self.draw_checkboxes()
             self.draw()
             self.winner(self.winner_player)
-            pygame.display.update()
+            pygame.display.flip()
             self.clock.tick(30)
         pygame.display.quit()
         pygame.quit()

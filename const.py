@@ -1,7 +1,6 @@
 import pygame
 RADIUS = 100
 
-# WIDTH, HEIGHT = 750, 750
 WIDTH, HEIGHT = 1024,768 
 WHITE = (255, 255, 255)
 BLACK = (0, 0, 0)
@@ -34,4 +33,3 @@ HELP_SYMBOL = "?"
 def init():
     global WIN, WIDTH, HEIGHT
     WIN = pygame.display.get_surface()
-    # WIDTH, HEIGHT = WIN.get_size()
