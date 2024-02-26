@@ -20,9 +20,6 @@
 # SOFTWARE.
 #
 
-from gettext import gettext as _
-
-import sys
 import gi
 
 gi.require_version("Gtk", "3.0")
@@ -32,13 +29,11 @@ import pygame
 from sugar3.activity.activity import Activity
 from sugar3.graphics.toolbarbox import ToolbarBox
 from sugar3.activity.widgets import ActivityToolbarButton
-from sugar3.graphics.toolbutton import ToolButton
 from sugar3.activity.widgets import StopButton
 
-
 import sugargame.canvas
-
 import NimGame
+
 
 class Nimgame(Activity):
     def __init__(self, handle):

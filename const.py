@@ -1,7 +1,7 @@
 import pygame
 RADIUS = 100
 
-WIDTH, HEIGHT = 1024,768 
+WIDTH, HEIGHT = 1024, 768
 WHITE = (255, 255, 255)
 BLACK = (0, 0, 0)
 CHECKBOX_SIZE = 30
@@ -12,7 +12,7 @@ CHECKBOX_WIDTH = NUM_COLS * CHECKBOX_SIZE + (NUM_COLS - 1) * CHECKBOX_MARGIN
 CHECKBOX_HEIGHT = NUM_ROWS * CHECKBOX_SIZE + (NUM_ROWS - 1) * CHECKBOX_MARGIN
 
 # colors
-GUNMETAL = (129, 133, 137) #Gunmetal Gray
+GUNMETAL = (129, 133, 137)  # Gunmetal Gray
 
 BUTTON_WIDTH = 200
 BUTTON_HEIGHT = 70
@@ -29,6 +29,7 @@ GAME_RULE = [
     "Computer responds immediately after you made your move."
 ]
 HELP_SYMBOL = "?"
+
 
 def init():
     global WIN, WIDTH, HEIGHT
