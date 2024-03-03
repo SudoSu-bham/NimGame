@@ -1,5 +1,5 @@
 [Activity]
-name = Nim-Game
+name = NimGame
 activity_version = 3
 bundle_id = org.sugarlabs.NimGame
 exec = sugar-activity3 Nimactivity.Nimgame
