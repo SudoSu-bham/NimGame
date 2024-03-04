@@ -1,4 +1,4 @@
-import pygame
+import pygame as pg
 import gi
 import sys
 import random
@@ -16,12 +16,12 @@ class NimGame:
         self.winner_player = None
         self.need_help = False
 
-        self.clock = pygame.time.Clock()  # Set up clock for managing FPS.
+        self.clock = pg.time.Clock()  # Set up clock for managing FPS.
         self.randomly_fill_checkboxes()  # First time fill all box randomly
 
     def set_canvas(self, canvas):
         self.canvas = canvas
-        pygame.display.set_caption("Nim Game")
+        pg.display.set_caption("Nim Game")
 
     # Called to save the state of the game to the Journal.
     def write_file(self, file_path):
@@ -37,7 +37,7 @@ class NimGame:
     # Declare the winner
     def winner(self, who):
         self.winner_player = who
-        font = pygame.font.Font(None, 36)
+        font = pg.font.Font(None, 36)
         win_text = "You won!"
         if who is None:
             return
@@ -52,13 +52,16 @@ class NimGame:
     def draw_checkboxes(self):
         for i in range(c.NUM_ROWS):
             for j in range(c.NUM_COLS):
-                rect = pygame.Rect((c.WIDTH - c.CHECKBOX_WIDTH) // 2 + j * (c.CHECKBOX_SIZE + c.CHECKBOX_MARGIN),
-                                   (c.HEIGHT - c.CHECKBOX_HEIGHT) // 2 + i * (c.CHECKBOX_SIZE + c.CHECKBOX_MARGIN),
-                                   c.CHECKBOX_SIZE, c.CHECKBOX_SIZE)
-                pygame.draw.rect(c.WIN, c.BLACK, rect, 2)
+                val1 = c.CHECKBOX_SIZE + c.CHECKBOX_MARGIN
+                rect = pg.Rect(
+                    (c.WIDTH - c.CHECKBOX_WIDTH) // 2 + j * val1,
+                    (c.HEIGHT - c.CHECKBOX_HEIGHT) // 2 + i * val1,
+                    c.CHECKBOX_SIZE, c.CHECKBOX_SIZE
+                )
+                pg.draw.rect(c.WIN, c.BLACK, rect, 2)
                 # Fill checkbox with color if it's checked
                 if self.checkbox_state[i][j]:
-                    pygame.draw.rect(c.WIN, "green", rect)
+                    pg.draw.rect(c.WIN, "green", rect)
 
     def randomly_fill_checkboxes(self):
         # Reset all checkbox states to False
@@ -84,12 +87,12 @@ class NimGame:
         for i in range(no_column_remove + 1):
             self.checkbox_state[row][end - i] = False
 
-        if self.checkbox_state[0][0] is False and self.checkbox_state[1][0] is False and self.checkbox_state[2][0] is False:
+        if not any(self.checkbox_state[i][0] for i in range(c.NUM_ROWS)):
             self.winner(0)
 
     # This is the easy mode
     def computer_move(self):
-        if self.checkbox_state[0][0] is False and self.checkbox_state[1][0] is False and self.checkbox_state[2][0] is False:
+        if not any(self.checkbox_state[i][0] for i in range(c.NUM_ROWS)):
             self.winner(1)
 
         # Computer chooses a row to click on
@@ -106,22 +109,30 @@ class NimGame:
             c.HELP_SYMBOL = "X"
             y = c.MARGIN
             c.LINE_SPACING = c.HEIGHT // 27
-            font = pygame.font.Font(None, c.WIDTH // 39)
+            font = pg.font.Font(None, c.WIDTH // 39)
             for line in c.GAME_RULE:
                 text_surface = font.render(line, True, c.WHITE)
                 text_rect = text_surface.get_rect(topleft=(c.MARGIN, y))
                 c.WIN.blit(text_surface, text_rect)
                 y += c.LINE_SPACING
 
-        BUTTON_FONT = pygame.font.SysFont(None, c.BUTTON_FONT_SIZE)
-        self.button_rect = pygame.Rect((c.WIDTH - c.BUTTON_WIDTH) // 2, c.HEIGHT - c.BUTTON_HEIGHT * 3, c.BUTTON_WIDTH, c.BUTTON_HEIGHT)
-        pygame.draw.rect(c.WIN, c.WHITE, self.button_rect, 0, border_radius=20)
+        BUTTON_FONT = pg.font.SysFont(None, c.BUTTON_FONT_SIZE)
+        self.button_rect = pg.Rect(
+            (c.WIDTH - c.BUTTON_WIDTH) // 2,
+            c.HEIGHT - c.BUTTON_HEIGHT * 3,
+            c.BUTTON_WIDTH,
+            c.BUTTON_HEIGHT
+        )
+        pg.draw.rect(c.WIN, c.WHITE, self.button_rect, 0, border_radius=20)
         button_text = BUTTON_FONT.render(c.BUTTON_TEXT, True, c.GUNMETAL)
         text_rect = button_text.get_rect(center=self.button_rect.center)
         c.WIN.blit(button_text, text_rect)
 
-        HELP_FONT = pygame.font.SysFont(None, 80)
-        self.help_cicle = pygame.draw.circle(c.WIN, c.WHITE, [c.WIDTH - 100, c.HEIGHT - (c.HEIGHT) + 100], 40, 40)
+        HELP_FONT = pg.font.SysFont(None, 80)
+        self.help_cicle = pg.draw.circle(
+            c.WIN, c.WHITE,
+            [c.WIDTH - 100, c.HEIGHT - (c.HEIGHT) + 100],
+            40, 40)
         help_text = HELP_FONT.render(c.HELP_SYMBOL, True, c.GUNMETAL)
         help_rect = help_text.get_rect(center=self.help_cicle.center)
         c.WIN.blit(help_text, help_rect)
@@ -130,7 +141,11 @@ class NimGame:
     def player_move(self, x, y):
         for i in range(c.NUM_ROWS):
             for j in range(c.NUM_COLS):
-                rect = pygame.Rect((c.WIDTH - c.CHECKBOX_WIDTH) // 2 + j * (c.CHECKBOX_SIZE + c.CHECKBOX_MARGIN), (c.HEIGHT - c.CHECKBOX_HEIGHT) // 2 + i * (c.CHECKBOX_SIZE + c.CHECKBOX_MARGIN), c.CHECKBOX_SIZE, c.CHECKBOX_SIZE)
+                val1 = c.CHECKBOX_SIZE + c.CHECKBOX_MARGIN
+                rect = pg.Rect(
+                    (c.WIDTH - c.CHECKBOX_WIDTH) // 2 + j * val1,
+                    (c.HEIGHT - c.CHECKBOX_HEIGHT) // 2 + i * val1,
+                    c.CHECKBOX_SIZE, c.CHECKBOX_SIZE)
                 if rect.collidepoint(x, y):
                     if not self.checkbox_state[i][j]:
                         break
@@ -143,14 +158,14 @@ class NimGame:
 
     # The main game loop.
     def run(self):
-        for event in pygame.event.get():
-            if event.type == pygame.VIDEORESIZE:
-                pygame.display.set_mode(event.size, pygame.RESIZABLE)
+        for event in pg.event.get():
+            if event.type == pg.VIDEORESIZE:
+                pg.display.set_mode(event.size, pg.RESIZABLE)
                 c.WIDTH, c.HEIGHT = event.size
                 break
         self.running = True
         c.init()
-        pygame.font.init()
+        pg.font.init()
         while self.running:
             if self.journal:
                 # Pump GTK messages.
@@ -160,14 +175,15 @@ class NimGame:
                 break
 
             # Pump PyGame messages.
-            for event in pygame.event.get():
-                if event.type == pygame.QUIT:
+            for event in pg.event.get():
+                if event.type == pg.QUIT:
                     self.running = False
-                elif event.type == pygame.VIDEORESIZE:
-                    pygame.display.set_mode((c.WIDTH, c.HEIGHT), pygame.RESIZABLE)
+                elif event.type == pg.VIDEORESIZE:
+                    pg.display.set_mode(
+                        (c.WIDTH, c.HEIGHT), pg.RESIZABLE)
                     break
-                elif event.type == pygame.MOUSEBUTTONDOWN and event.button == 1:
-                    x, y = pygame.mouse.get_pos()
+                elif event.type == pg.MOUSEBUTTONDOWN and event.button == 1:
+                    x, y = pg.mouse.get_pos()
                     if self.button_rect.collidepoint(x, y):  # Reset button
                         self.randomly_fill_checkboxes()
                         self.winner_player = None
@@ -179,20 +195,20 @@ class NimGame:
 
                     self.player_move(x, y)
 
-            c.WIN.fill(pygame.Color(c.GUNMETAL))
+            c.WIN.fill(pg.Color(c.GUNMETAL))
             self.draw_checkboxes()
             self.draw()
             self.winner(self.winner_player)
-            pygame.display.flip()
+            pg.display.flip()
             self.clock.tick(30)
-        pygame.display.quit()
-        pygame.quit()
+        pg.display.quit()
+        pg.quit()
         sys.exit(0)
 
 
 def main():
-    pygame.init()
-    pygame.display.set_mode((c.WIDTH, c.HEIGHT))
+    pg.init()
+    pg.display.set_mode((c.WIDTH, c.HEIGHT))
     game = NimGame(journal=False)
     game.run()
 
