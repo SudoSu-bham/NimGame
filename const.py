@@ -24,7 +24,8 @@ LINE_SPACING = 20
 MARGIN = 30
 GAME_RULE = [
     "The game board consists of three rows of checkboxes.",
-    "Every time you click on a checked box, checks on this one and all boxes to the right are removed.",
+    "Every time you click on a checked box,checks on this"
+    "one and all boxes to the right are removed.",
     "It's you against your computer. The one who removes the last check wins.",
     "Computer responds immediately after you made your move."
 ]
