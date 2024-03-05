@@ -18,4 +18,4 @@ python3 NimGame.py
 ```
 
 #### The GUI of game
-![Screenshot from 2024-03-05 00-28-10](https://github.com/SudoSu-bham/NimGame/assets/55135022/2858a66a-1829-4c84-95a8-c04f717b2e40)
+![NimGame](https://github.com/SudoSu-bham/NimGame/assets/55135022/e9902e9f-02d4-4948-a079-9ffbc4fa12fa)
