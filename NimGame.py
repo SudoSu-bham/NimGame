@@ -35,6 +35,8 @@ class NimGame:
     def __init__(self, journal=True):
         self.journal = journal
         self.checkbox_state = [[False] * c.NUM_COLS for _ in range(c.NUM_ROWS)]
+        self.nim_sum_list = [0, 0, 0]  # Nim sum of each row
+        self.nimsum = 0
         self.winner_player = None
         self.need_help = False
 
@@ -95,35 +97,57 @@ class NimGame:
         for i in range(c.NUM_ROWS):
             # Total checkboxes to be filled in current row
             num_to_fill = random.randint(1, c.NUM_COLS)
+            self.nim_sum_list[i] = num_to_fill
             start_col = 0
             for j in range(start_col, start_col + num_to_fill):
                 self.checkbox_state[i][j] = True
 
     # Deleting a range of columns selected by computer
-    def delete_column(self, row):
+    def delete_column(self, row, rm_col):
         end = c.NUM_COLS - 1
         if not self.checkbox_state[row][c.NUM_COLS - 1]:
             end = (self.checkbox_state[row]).index(False)
 
-        no_column_remove = random.randint(1, end)
-        for i in range(no_column_remove + 1):
+        if rm_col == 0:
+            rm_col = random.randint(1, end)
+        for i in range(rm_col + 1):
             self.checkbox_state[row][end - i] = False
 
-        if not any(self.checkbox_state[i][0] for i in range(c.NUM_ROWS)):
+        # Update nim sum list after column deletion
+        self.nim_sum_list[row] -= rm_col
+
+        if not any(self.nim_sum_list[i] for i in range(c.NUM_ROWS)):
             self.winner(0)
 
-    # This is the easy mode
+    # This is the efficient mode
     def computer_move(self):
-        if not any(self.checkbox_state[i][0] for i in range(c.NUM_ROWS)):
+        if not any(self.nim_sum_list[i] for i in range(c.NUM_ROWS)):
             self.winner(1)
 
-        # Computer chooses a row to click on
+        # Calculate nimsum
+        self.nimsum = self.nim_sum_list[0]
+        for i in range(1, c.NUM_ROWS):
+            self.nimsum = (self.nimsum ^ self.nim_sum_list[i])
+
+        # Computer playing efficiently
+        if self.nimsum != 0:
+            indx = 0
+            for n in self.nim_sum_list:
+                # If this is not an illegal move
+                # then make this move.
+                if ((n ^ self.nimsum) < n):
+                    no_column_remove = n - (n ^ self.nimsum)
+                    self.delete_column(indx, no_column_remove)
+                    break
+                indx += 1
+
+        # Computer randomly playing when player winning
         elif self.checkbox_state[0][0] is True:
-            self.delete_column(0)
+            self.delete_column(0, 0)
         elif self.checkbox_state[1][0] is True:
-            self.delete_column(1)
+            self.delete_column(1, 0)
         elif self.checkbox_state[2][0] is True:
-            self.delete_column(2)
+            self.delete_column(2, 0)
 
     # Making a Reset game button and help menu
     def draw(self):
@@ -171,10 +195,14 @@ class NimGame:
                 if rect.collidepoint(x, y):
                     if not self.checkbox_state[i][j]:
                         break
-                    self.checkbox_state[i][j] = not self.checkbox_state[i][j]
-                    if not self.checkbox_state[i][j]:
-                        for k in range(j, c.NUM_COLS):
-                            self.checkbox_state[i][k] = False
+                    if self.checkbox_state[i][j]:
+                        indx = 0
+                        while (indx + j < c.NUM_COLS):
+                            if not self.checkbox_state[i][j + indx]:
+                                break
+                            self.nim_sum_list[i] -= 1
+                            self.checkbox_state[i][j + indx] = False
+                            indx += 1
                     self.computer_move()
                     break
 
