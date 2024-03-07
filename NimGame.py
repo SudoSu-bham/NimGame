@@ -101,21 +101,25 @@ class NimGame:
             start_col = 0
             for j in range(start_col, start_col + num_to_fill):
                 self.checkbox_state[i][j] = True
-
     # Deleting a range of columns selected by computer
     def delete_column(self, row, rm_col):
         end = c.NUM_COLS - 1
         if not self.checkbox_state[row][c.NUM_COLS - 1]:
-            end = (self.checkbox_state[row]).index(False)
+            end = (self.checkbox_state[row]).index(False) - 1
 
         if rm_col == 0:
-            rm_col = random.randint(1, end)
-        for i in range(rm_col + 1):
-            self.checkbox_state[row][end - i] = False
+            try:
+                rm_col = random.randint(1, end)
+            except:
+                rm_col = 1
 
         # Update nim sum list after column deletion
         self.nim_sum_list[row] -= rm_col
 
+        last_indx = 0
+        while(rm_col > last_indx):
+            self.checkbox_state[row][end - last_indx] = False
+            last_indx += 1
         if not any(self.nim_sum_list[i] for i in range(c.NUM_ROWS)):
             self.winner(0)
 
@@ -212,6 +216,8 @@ class NimGame:
             if event.type == pg.VIDEORESIZE:
                 pg.display.set_mode(event.size, pg.RESIZABLE)
                 c.WIDTH, c.HEIGHT = event.size
+                if(event.size[0] > 1200):
+                    c.CHECKBOX_SIZE += 10
                 break
         self.running = True
         c.init()
